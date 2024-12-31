@@ -1,0 +1,1754 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <link rel="stylesheet" href="templates\styles.css">
+    
+<style>
+  /* Add styles for the notification and bell icon */
+  .notification {
+            background-color: #ffcc00;
+            padding: 10px;
+            border: 1px solid #ffd700;
+            color: #000;
+            margin: 10px 0;
+        }
+        .notification-list {
+            margin: 10px 0;
+        }
+        .bell-icon {
+            position: relative;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 5px;
+            font-size: 12px;
+        }
+    
+        body {
+            font-family: Arial, sans-serif,Verdana, Tahoma, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color:lightskyblue;
+        }
+        .container {
+            display: flex;
+            width: 100%;
+        }
+        #sidebar {
+            width: 200px;
+            background-color: #2f3b52;
+            color:white;
+            padding: 20px;
+            position: fixed;
+            left:0;
+            top: 0;
+            height: 100%;
+            padding-top:20px;
+            padding-left:20px;
+        }
+        #sidebar a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: white;
+            margin: 5px 0;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+           
+            
+        }
+        #sidebar a:hover {
+            background-color: #5b6c8e;
+        }
+        .content {
+            padding: 20px;
+            margin-left:250px;
+           
+        }
+        .content h1 {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            padding: 50%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border-radius: 40px;
+                border:4px double#000;
+            box-shadow: #000;
+            font-size: medium;
+        }
+        thead th{
+            font-size: 20px;
+            font-weight:bold;
+            font-style: italic;
+            font-stretch: expanded;
+        
+            padding: 20px;
+
+        }
+        table, th, td {
+            border: 2px solid #000;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+            font-size: medium;
+            font-weight: bolder;
+        }
+        .form-container {
+            margin-top: 20px;
+        }
+        .form-container input, .form-container select, .form-container button {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 100%;
+        }
+        .section {
+            display: none;
+        }
+        .active-section {
+            display: block;
+        }
+        .notification {
+            background-color: #ffcc00;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ffd700;
+            color: #000;
+        }
+        .chart-container {
+            width: 60%;
+            padding-right: 20px;
+        }
+        /* Modal (Popup Form) Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            width: 60%;
+            border-radius: 8px;
+        }
+        .close-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            font-size: 20px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color:rgb(234, 193, 193) ;
+            padding: 20px 20px;
+            box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            margin-top:20px;
+           
+        }
+
+        .notification {
+            font-size: 24px;
+            cursor: pointer;
+        }
+        @media screen and (max-width: 768px) {
+            #sidePanel {
+                width: 160px;
+            }
+
+            #content {
+                margin-left: 160px;
+            }
+
+            .account-card {
+                width: 100%;
+                max-width: 300px;
+            }
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .chart-container, .table-container {
+                width: 100%;
+                padding: 0;
+            }
+        }
+        .progress-bar {
+            position: relative;
+            height: 20px;
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            line-height: 20px;
+            text-align: center;
+            color: white;
+            border-radius: 5px;
+        }
+        .green { background-color: green; }
+        .yellow { background-color: yellow; color: black; }
+        .red { background-color: red; }
+/* Main container for the cards */
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+/* Individual card style */
+.atm-card {
+    width: 300px;
+    height: 190px;
+    background-color: #1e2a47;
+    color: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.atm-card:hover {
+    transform: scale(1.05);
+}
+
+/* Top part of the card with chip and logo */
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chip {
+    width: 35px;
+    height: 25px;
+    background-color: #d1d3d8;
+    border-radius: 3px;
+}
+
+.card-logo {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* Middle part of the card with card number */
+.card-middle {
+    margin-top: 15px;
+    font-size: 16px;
+}
+
+.card-number {
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+
+.card-holder {
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+/* Balance Box - Small box around the amount only */
+.balance-box {
+    background-color: #4CAF50; /* Green background for balance */
+    padding: 8px 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    text-align: center;
+    width: fit-content;
+    font-weight: bold;
+    color: white;
+    font-size: 16px;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
+
+/* Bottom part of the card with expiry date and CVV */
+.card-bottom {
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.expiry, .cvv {
+    display: block;
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+/* Styling for the modal and form */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: lightseagreen;
+    padding: center;
+    border-radius: 5px;
+    width: 400px;
+}
+
+.close-btn {
+    font-size: 20px;
+    color: #333;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+
+.form-container {
+    margin-top: 20px;
+}
+
+button {
+    background-color: grey;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #2a3a72;
+}
+
+.status {
+    padding: 5px 10px;
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.status:hover {
+    opacity: 0.8;
+}
+.notification-bell {
+    position: relative;
+    display: inline-block;
+    
+}
+
+.dropdown {
+    position: relative;
+   
+}
+
+.dropdown-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: #333;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    z-index: 1;
+
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+           
+            max-width:100%;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.notification-message {
+    font-size: 14px;
+    color: red;
+}
+
+/*notify*/
+/* Bell Icon Container */
+.notification-container {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+/* Bell Icon */
+.bell-icon {
+    font-size: 24px;
+    color: #333;
+    position: relative;
+}
+
+/* Red Badge on Bell Icon */
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 50%;
+    padding: 2px 6px;
+}
+
+/* Dropdown for Pending Bills */
+.dropdown {
+    display: none;
+    position: absolute;
+    top: 30px;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 250px;
+    z-index: 1000;
+    padding: 10px;
+}
+
+/* Dropdown List Style */
+.dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dropdown li {
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.dropdown li:last-child {
+    border-bottom: none;
+}
+
+/* Due Today Alert Style */
+.due-today {
+    color: red;
+    font-weight: bold;
+}
+
+/* Empty Message */
+.dropdown p {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+}
+
+/* dash */
+
+/* Main Container - Flexbox Layout */
+.containerd {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Adjust the gap between columns */
+    flex-wrap: wrap;
+}
+
+/* Left Column - Transaction Table */
+#transaction-containerd {
+    flex: 1;
+    max-width: 48%;
+    background-color:yellow;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+#transaction-containerd table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: greenyellow;
+}
+
+#transaction-containerd th, #transaction-containerd td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+#transaction-containerd th {
+    background-color: #f0f0f0;
+}
+
+#transaction-containerd tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Right Column - Expenses Section */
+#expenses-containerd {
+    flex: 1;
+    max-width: 48%;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+#expenses-containerd h1 {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+/* Chart Container */
+.chart-containerd {
+    text-align: center;
+    margin-bottom: 20px;
+    height: 500px; /* Ensure the chart has a visible height */
+    background-color: #f4f4f4; /* Temporary background to visualize the chart container */
+    width: 500px; /* Full width for the chart */
+}
+
+/* Expense Table */
+.expense-table-containerd {
+    margin-top: 20px;
+}
+
+.expense-table-containerd table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.expense-table-containerd th, .expense-table-containerd td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.expense-table-containerd th {
+    background-color: #f0f0f0;
+}
+
+.expense-table-containerd tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.color-boxd {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .containerd {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #transaction-containerd, #expenses-containerd {
+        width: 90%;
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .chart-containerd {
+        width: 100%; /* Ensure the chart takes full width */
+    }
+}
+
+
+    .hidden {
+        display: none; /* Hide rows by default */
+    }
+
+    .cardin {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+           
+            max-width:100%;
+        }
+
+        .userhead{
+            background-color: lightcyan;
+            font-size: large;
+            font-weight: bolder;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            align-items:center;
+            justify-content:center;
+            padding:15px;
+            font-style: courier;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            font-size: large;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+            
+        }
+
+        .form-group button:hover {
+            background-color: #218838;
+        }
+
+        .form-group button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+
+        .form-group h2{
+            text-align: center;
+            margin-bottom: 20px;
+            text-decoration: underline;
+        }
+ 
+table {
+            width: 100%;
+            padding: 50%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border-radius: 40px;
+            
+            box-shadow: #000;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        } 
+table {
+    width: 100%;
+    padding: 50%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    border-radius: 40px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: 4px double #000; 
+}
+
+table, th, td {
+    border: 2px double #000; 
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    padding: 50%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    border-radius: 40px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: 4px double #000; 
+}
+
+table, th, td {
+    border: 2px double #000;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+
+thead td {
+    font-size: 18px; 
+    font-weight: bold; 
+    
+}
+thead{
+    background-color: orange;
+}
+tbody{
+    background-color: lightgoldenrodyellow;
+}
+/* Flex container for chart and table */
+.flex-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px; /* Space between chart and table */
+}
+
+.error-popup {
+    color: red;
+    font-size: 12px;
+    margin-bottom: 5px; /* Space between the error and input field */
+    display: block; 
+    }
+
+    .error-border {
+        border: 2px solid red;
+    }
+
+</style>
+</head>
+<body>
+      
+    
+    
+    
+        <!-- Sidebar -->
+        <div id="sidebar">
+            <h1><a href="javascript:void(0);" onclick="showSection('Dashboard')">Dashboard</a></h1>
+            <h3><a href="javascript:void(0);" onclick="showSection('balances')">Balances</a></h3>
+            <h3><a href="javascript:void(0);" onclick="showSection('bills')">Transaction</a></h3>
+            <h3><a href="javascript:void(0);" onclick="showSection('bills_manage')">Bills</a></h3>
+            <h3><a href="javascript:void(0);" onclick="showSection('expenses')">Expenses</a></h3>
+            <h3><a href="javascript:void(0);" onclick="showSection('goal-section')">Goals</a></h3>
+            <h3><a href="{{ url_for('logout') }}">Logout</a></h3>
+
+        </div>
+
+        <!-- Content Area -->
+        <div class="content">
+            <!-- Notification Area -->
+            <div class="header">
+                
+                <div class="userhead" >Hi {{username}}, {{current_date}}</div>
+                <div>
+                    <input type="text" placeholder="Search Here...">
+                </div>
+                
+                
+                <div class="notification-container">
+                    
+                    <div class="notification-bell" onclick="toggleDropdown()">
+                    🔔
+                    {% if notification_count > 0 %}
+                    <span class="notification-count" id="notificationCount">{{ notification_count }}</span>
+                    {% endif %}
+                    <!-- Dropdown for Pending Notifications -->
+                    <div class="dropdown" id="notificationDropdown">
+                        
+                      <!-- Loop through all pending bills -->
+                {% for bill in pending_bills %}
+                <div class="dropdown-item" style="color: {% if bill.due_date == current_date %}red{% else %}black{% endif %};">
+                    {{ bill.bill_name }} - {{ bill.due_date }} - ₹{{ bill.amount }}
+                </div>
+            {% endfor %}
+            
+            <!-- If no pending bills, show a message -->
+            {% if not pending_bills %}
+                <div class="dropdown-item no-due">
+                    No pending bills.
+                </div>
+            {% endif %}   
+            
+                        
+                    </div>
+                    <script>
+                        // Toggle the dropdown visibility when the bell icon is clicked
+                        function toggleDropdown() {
+                            var dropdown = document.getElementById("notificationDropdown");
+                            dropdown.style.display = (dropdown.style.display === "block") ? "none" : "block";
+                        }
+                
+                        // Close the dropdown if the user clicks outside of it
+                        window.onclick = function(event) {
+                            if (!event.target.matches('.notification-bell,.notification-bell *')) {
+                                var dropdown = document.getElementById("notificationDropdown");
+                                if (dropdown.style.display === "block") {
+                                    dropdown.style.display = "none";
+                                }
+                            }
+                        };
+                    </script>
+                    
+                </div>
+            </div></div>
+            <!-- Dashbaord Section -->
+            <section id="Dashboard" class="section">
+                
+
+    <div class="containerd">
+        <!-- Left Column - Transaction Table -->
+        <div id="transaction-containerd">
+            <h3>Transaction Overview</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Account Name</th>
+                        <th>Item</th>
+                        <th>Transaction Type</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                        <tr>
+                            <td>{{ transaction['account_id'] }}</td>
+                            <td>{{ transaction['transitem'] }}</td>
+                            <td>{{ transaction['transaction_type'] }}</td>
+                            <td>{{ transaction['amount'] }}</td>
+                            <td>{{ transaction['date'] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Right Column - Expenses Section -->
+        <section id="expenses-containerd">
+            <h1>Expense Dashboard</h1>
+
+            {% if expenses %}
+                <div class="containerd">
+                    <!-- Chart Container -->
+                    <div class="chart-containerd">
+                        <canvas id="expenseChartd" width="300" height="300"></canvas>
+                    </div>
+
+                    <!-- Expense Table Container -->
+                    <div class="expense-table-container">
+                        <h3>Expenses Overview</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Expense Item</th>
+                                    <th>Total Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for expense in expenses %}
+                                    <tr>
+                                        <td>
+                                            <span class="color-box" style="background-color: {{ expense.color }};"></span>
+                                            {{ expense.label }}
+                                        </td>
+                                        <td>{{ expense.amount }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <script>
+                    // Pie chart using Chart.js
+                    var ctx = document.getElementById('expenseChartd').getContext('2d');
+                    var expenseChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: {{ expenses | map(attribute='label') | list | tojson }},
+                            datasets: [{
+                                data: {{ expenses | map(attribute='amount') | list | tojson }},
+                                backgroundColor: {{ expenses | map(attribute='color') | list | tojson }},
+                                borderColor: '#fff',
+                                borderWidth: 1
+                            }]
+                        }
+                    });
+                </script>
+            {% else %}
+                <p>No expenses data available.</p>
+            {% endif %}
+        </section>
+    </div>
+
+
+            </section>
+
+            <!-- Balances Section -->
+            <section id="balances" class="section">
+                <h1>Account Holders (Balances)</h1>
+                <div class="card-container">
+                    {% for account in accounts %}
+                        <div class="atm-card">
+                            <div class="card-top">
+                                <div class="chip"></div>
+                                <div class="card-logo">VISA</div>
+                            </div>
+                            <div class="card-middle">
+                                <p class="card-number">
+                                    {% set cardno = account['cardno'] | string %}
+                                    {% if cardno == '0' %}
+                                        0000 0000 0000 0000
+                                    {% else %}
+                                        **** **** **** {{ cardno[-4:] }}
+                                    {% endif %}
+                                </p>
+                                <p class="card-holder">Cardholder: {{ account['name'] }}</p>
+                            </div>
+            
+                            <!-- Balance Box - Small box around the amount only -->
+                            <div class="balance-box">
+                                <p class="balance-amount">$ {{ account['balance'] }}</p>
+                            </div>
+            
+                            <div class="card-bottom">
+                                <div class="expiry">
+                                    <p>Expiry: {{ account['expdate'] if account['expdate'] else "MM/YY" }}</p>
+                                </div>
+                                <div class="cvv">
+                                    <p>CVV: {{ account['cvv'] if account['cvv'] else "000" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            
+                <div class="cardin">
+                    
+                    <h2>Add Account</h2>
+                    <button type="button" onclick="showAddAccountModal()">Add Account</button>
+                </div>
+                
+            </section>
+            <!-- Bills Section (Transactions) -->
+            <section id="bills" class="section">
+                
+                <div class="cardin">
+                    <h2>Add Transaction</h2>
+                    <button type="button" onclick="showAddTransactionModal()">Add Transaction</button>
+                </div>
+                <div id="tablecolor" class="cardin">
+                <h1>Transactions</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Account Name</th>
+                            <th>Item</th>
+                            <th>Transaction Type</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transaction-body">
+                        {% for transaction in transactions %}
+                            <tr class="transaction-row">
+                                <td>{{ transaction['account_id'] }}</td>
+                                <td>{{transaction['transitem']}}</td>
+                                <td>{{ transaction['transaction_type'] }}</td>
+                                <td>{{ transaction['amount'] }}</td>
+                                <td>{{ transaction['date'] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                <button id="toggle-older" onclick="toggleOlderRows()">Show Older Transactions</button>
+               
+            </section>
+
+            <!-- Bills Manage Section -->
+            <section id="bills_manage" class="section">
+                <h1>Upcoming Bills</h1>
+                <div class="cardin">
+                    <h2>Add Bill</h2>
+                  
+                    <button type="button" onclick="showaddBillModal()">Add bills</button>
+                </div>
+                
+                <div class="cardin">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Bill Name</th>
+                            <th>Item Description</th>
+                            <th>Due Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bill in bills %}
+                            <tr>
+                                <td>{{ bill['bill_name'] }}</td>
+                                <td>{{ bill['item_description'] }}</td>
+                                <td>{{ bill['due_date'] }}</td>
+                                <td>{{ bill['amount'] }}</td>
+                                <td>
+                                    {% if bill.status == 'Pending' %}
+                                    <span style="color: red;">{{ bill.status }}</span>
+                                    {% else %}
+                                    <span style="color: green;">{{ bill.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form action="{{ url_for('update_status', bill_id=bill['id']) }}" method="POST">
+                                        <select name="status">
+                                            <option value="Pending" {% if bill.status == 'Pending' %} selected {% endif %}>Pending</option>
+                                            <option value="Paid" {% if bill.status == 'Paid' %} selected {% endif %}>Paid</option>
+                                        </select>
+                                        <button type="submit">Update</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form action="{{ url_for('delete_bill', bill_id=bill['id']) }}" method="POST" style="display: inline;">
+                                        <button type="submit" onclick="return confirm('Are you sure you want to delete this bill?');" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+                
+
+        
+
+
+
+
+            </section>
+
+            <!-- Expenses Section -->
+            <section id="expenses" class="section">
+                <div class="cardin">
+                <h1 style="text-align: center;">Expense Dashboard</h1>
+    
+                <!-- Check if there are any expenses data -->
+                {% if expenses %}
+                        <div class="Flex-container">
+                        <!-- Chart Container -->
+                        <div class="chart-container">
+                            <canvas id="expenseChart" width="800" height="800"></canvas>
+                        </div>
+                        
+                        <!-- Table Container -->
+                        <div class="table-container">
+                            <h3>Expenses Overview</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Expense Item</th>
+                                        <th>Total Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for expense in expenses %}
+                                        <tr>
+                                            <td>
+                                                <span class="color-box" style="background-color: {{ expense.color }};"></span>
+                                                {{ expense.label }}
+                                            </td>
+                                            <td>{{ expense.amount }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div></div>
+                    </div>
+            
+                    <script>
+                        // Pie chart using Chart.js
+                        var ctx = document.getElementById('expenseChart').getContext('2d');
+                        var expenseChart = new Chart(ctx, {
+                            type: 'pie',
+                            data: {
+                                labels: {{ expenses | map(attribute='label') | list | tojson }},
+                                datasets: [{
+                                    data: {{ expenses | map(attribute='amount') | list | tojson }},
+                                    backgroundColor: {{ expenses | map(attribute='color') | list | tojson }},
+                                    borderColor: '#fff',
+                                    borderWidth: 1
+                                }]
+                            }
+                        });
+                    </script>
+                {% else %}
+                    <p>No expenses data available.</p>
+                {% endif %}
+                
+            
+            
+            
+            </section>
+            
+          <!-- Goal Section -->
+<section id="goal-section" class="section">
+    <h1>Goals Management</h1>
+    <div class="cardin">
+    <h2>Total Account Balance: ₹{{ total_balance | default(0.0) | round(2) }}</h2>
+    </div>
+    <div class="cardin">
+
+    <form method="POST" action="/add_goal" id="goalForm" onsubmit="return validateGoalForm()">
+        <h3>Add a New Goal</h3>
+        <input type="text" name="goal_name" placeholder="Goal Name" >
+        <span id="goalnameerror" class="error-popup"></span>
+        <input type="number" step="0.01" name="goal_target" placeholder="Target Amount">
+        <span id="goalTargetError" class="error-popup"></span>
+        <button type="submit">Add Goal</button>
+    </form>
+    </div>
+    <div class="cardin">
+    <table>
+        <thead>
+            <tr>
+                <th>Goal Name</th>
+                <th>Target Amount</th>
+                <th>Progress (%)</th>
+                <th>Progress Bar</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="goalbody">
+            {% for goal in goals %}
+            <tr class="goalrow {% if not loop.last %}hidden{% endif %}">
+                <td>{{ goal.goal_name }}</td>
+                <td>₹{{ goal.goal_target| default(0.0) | round(2) }}</td>
+                <td>{{ goal.progress_percentage |default(0.0)| round(2) }}%</td>
+                <td>
+                    <div class="progress-bar">
+                        <div 
+                            class="progress-bar-fill 
+                                {% if goal.progress_percentage == 100 %}green
+                                {% elif goal.progress_percentage >= 50 %}yellow
+                                {% else %}red{% endif %}"
+                            style="width: {{ goal.progress_percentage }}%;">
+                            {{ goal.progress_percentage | round(2) }}%
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <form method="POST" action="/delete_goal/{{ goal.id }}">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table></div>
+    <button id="toggleButton" onclick="goallike()">Show Older Goals</button>
+</section>
+
+        </div>
+    </div>
+</div>
+    
+    <!-- Add Transaction Modal -->
+<div id="addTransactionModal" class="modal">
+    <div class="modal-content">
+        <div class="cardin">
+            <div class="form-group">
+                <button class="close-btn" onclick="closeAddTransactionModal()">×</button>
+                <h2>Add Transaction</h2>
+                <form id="transactionForm" action="{{ url_for('add_transaction') }}" method="POST" onsubmit="return validateTransactionForm()">
+                    <label for="accname">Select Account Holder</label>
+                    <select name="account_id" id="accname" >
+                        <option value="">Select Account</option>
+                        {% for account in accounts %}
+                            <option value="{{ account['id'] }}">{{ account['name'] }}</option>
+                        {% endfor %}
+                    </select>
+                    <span class="error-popup" id="accnameError"></span>
+
+                    <label for="transitemh">Item Name</label>
+                    <input type="text" name="transitem" id="transitemh" placeholder="Item" >
+                    <span id="transitemError" class="error-popup" ></span>
+
+                    <label for="transtype">Transaction Type</label>
+                    <select name="transaction_type" id="transtype">
+                        <option value="">Select Transaction Type</option>
+                        <option value="deposit">Deposit</option>
+                        <option value="withdrawal">Withdrawal</option>
+                    </select>
+                    <span class="error-popup" id="transtypeError"></span>
+
+                    <label for="transam">Transaction Amount</label>
+                    <input type="number" step="0.01" name="amount" id="transam" placeholder="Amount">
+                    <span class="error-popup" id="transamError"></span>
+
+                    <label for="transdat">Transaction Date</label>
+                    <input type="date" name="date" id="transdat">
+                    <span class="error-popup" id="transdatError"></span>
+
+                    <button type="submit">Submit Transaction</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Bill Modal -->
+<div id="addBillModal" class="modal">
+    <div class="modal-content">
+        <div class="cardin">
+            <div class="form-group">
+                <button class="close-btn" onclick="closeAddbillModal()">X</button>
+                <h2>Add Bill</h2>
+                <form id="billForm" action="{{ url_for('add_bill') }}" method="POST" onsubmit="return validateBillForm()">
+                    
+                    <label for="billnam">Bill Name</label>
+                    <input type="text" name="bill_name" id="billnam" placeholder="Bill Name" >
+                    <span class="error-popup" id="billnamError"></span>
+
+                    <label for="billit">Item Description</label>
+                    <input type="text" name="item_description" id="billit" placeholder="Item Description">
+                    <span class="error-popup" id="billitError"></span>
+
+                    <label for="billdat">Due Date</label>
+                    <input type="date" name="due_date" id="billdat">
+                    <span class="error-popup" id="billdatError"></span>
+
+                    <label for="BillAmoun">Bill Amount</label>
+                    <input type="number" step="0.01" id="BillAmoun" name="Billam" placeholder="Amount">
+                    <span class="error-popup" id="BillAmounError"></span>
+
+                    <button type="submit">Add Bill</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Account Modal -->
+<div id="addAccountModal" class="modal">
+    <div class="modal-content">
+        <div class="cardin">
+            <div class="form-group">
+                <button class="close-btn" onclick="closeAddAccountModal()">X</button>
+                <h2>Add Account</h2>
+                <form id="accountForm" action="{{ url_for('add_account') }}" method="POST" onsubmit="return validateAccountForm()">
+                    <input type="number" name="cardnumber" placeholder="Card Number">
+                    <span class="error-popup" id="cardnumberError"></span><br>
+
+                    <input type="text" name="name" placeholder="Card Name">
+                    <span class="error-popup" id="nameError"></span><br>
+
+                    <input type="date" name="expdate" placeholder="Expiry Date(MM/YY)">
+                    <span class="error-popup" id="expdateError"></span><br>
+
+                    <input type="number" name="cvv" placeholder="CVV">
+                    <span class="error-popup" id="cvvError"></span><br>
+
+                    <input type="number" step="0.01" name="balance" placeholder="Amount">
+                    <span class="error-popup" id="balanceError"></span><br>
+
+                    <button type="submit">Add Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+function validateTransactionForm() {
+    // Get form inputs
+    const accountId = document.querySelector("select[name='account_id']").value.trim();
+    const transItem = document.querySelector("input[name='transitem']").value.trim();
+    const transType = document.querySelector("select[name='transaction_type']").value.trim();
+    const amount = document.querySelector("input[name='amount']").value.trim();
+    const transDate = document.querySelector("input[name='date']").value.trim();
+
+    // Error span elements
+    const accountIdError = document.getElementById("accnameError");
+    const transItemError = document.getElementById("transitemError");
+    const transTypeError = document.getElementById("transtypeError");
+    const amountError = document.getElementById("transamError");
+    const transDateError = document.getElementById("transdatError");
+
+    // Regex patterns
+    const amountPattern = /^[0-9]+(\.[0-9]{1,2})?$/; // Numeric with up to 2 decimal places
+
+    let isValid = true;
+
+    // Reset error messages
+    accountIdError.textContent = "";
+    transItemError.textContent = "";
+    transTypeError.textContent = "";
+    amountError.textContent = "";
+    transDateError.textContent = "";
+
+    // Validate Account ID
+    if (accountId === "") {
+        accountIdError.textContent = "Account is required.";
+        isValid = false;
+    }
+
+    // Validate Transaction Item
+    if (transItem === "") {
+        transItemError.textContent = "Transaction item is required.";
+        isValid = false;
+    }
+
+    // Validate Transaction Type
+    if (transType === "") {
+        transTypeError.textContent = "Transaction type is required.";
+        isValid = false;
+    }
+
+    // Validate Amount (greater than 1)
+    if (!amountPattern.test(amount) || parseFloat(amount) <= 1) {
+        amountError.textContent = "Amount must be greater than 1.";
+        isValid = false;
+    }
+
+    // Validate Transaction Date
+    if (transDate === "") {
+        transDateError.textContent = "Transaction date is required.";
+        isValid = false;
+    }
+
+    return isValid; // Return false to prevent form submission if invalid
+}
+
+
+function validateBillForm() {
+    // Get form inputs
+    const billName = document.querySelector("input[name='bill_name']").value.trim();
+    const itemDescription = document.querySelector("input[name='item_description']").value.trim();
+    const dueDate = document.querySelector("input[name='due_date']").value.trim();
+    const amount = document.querySelector("input[name='Billam']").value.trim();
+
+    // Error span elements
+    const billNameError = document.getElementById("billnamError");
+    const itemDescriptionError = document.getElementById("billitError");
+    const dueDateError = document.getElementById("billdatError");
+    const amountError = document.getElementById("BillAmounError");
+
+    // Reset error messages
+    billNameError.textContent = "";
+    itemDescriptionError.textContent = "";
+    dueDateError.textContent = "";
+    amountError.textContent = "";
+
+    // Regex pattern for amount (up to 2 decimal places)
+    const amountPattern = /^[0-9]+(\.[0-9]{1,2})?$/;
+
+    let isValid = true;
+
+    // Validate Bill Name
+    if (billName === "") {
+        billNameError.textContent = "Bill name is required.";
+        isValid = false;
+    }
+
+    // Validate Item Description
+    if (itemDescription === "") {
+        itemDescriptionError.textContent = "Item description is required.";
+        isValid = false;
+    }
+
+    // Validate Due Date
+    if (dueDate === "") {
+        dueDateError.textContent = "Due date is required.";
+        isValid = false;
+    }
+
+    // Validate Amount (greater than 1)
+    if (!amountPattern.test(amount) || parseFloat(amount) <= 1) {
+        amountError.textContent = "Amount must be a valid number greater than 1.";
+        isValid = false;
+    }
+
+    return isValid; // Return false to prevent form submission if invalid
+}
+
+   
+function validateAccountForm() {
+    // Get form inputs
+    const cardNumber = document.querySelector("input[name='cardnumber']").value.trim();
+    const name = document.querySelector("input[name='name']").value.trim();
+    const expDate = document.querySelector("input[name='expdate']").value.trim();
+    const cvv = document.querySelector("input[name='cvv']").value.trim();
+    const balance = document.querySelector("input[name='balance']").value.trim();
+
+    // Error span elements
+    const cardNumberError = document.getElementById("cardnumberError");
+    const nameError = document.getElementById("nameError");
+    const expDateError = document.getElementById("expdateError");
+    const cvvError = document.getElementById("cvvError");
+    const balanceError = document.getElementById("balanceError");
+
+    // Regex patterns
+    const cardNumberPattern = /^\d{16}$/; // Exactly 16 digits
+    const namePattern = /^[a-zA-Z\s]+$/; // Only alphabets and spaces
+    const expDatePattern = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD format for date
+    const cvvPattern = /^\d{3}$/; // Exactly 3 digits
+    const balancePattern = /^[0-9]+(\.[0-9]{1,2})?$/; // Numeric with up to 2 decimal places
+
+    let isValid = true;
+
+    // Reset error messages
+    cardNumberError.textContent = "";
+    nameError.textContent = "";
+    expDateError.textContent = "";
+    cvvError.textContent = "";
+    balanceError.textContent = "";
+
+    // Validate card number
+    if (!cardNumberPattern.test(cardNumber)) {
+        cardNumberError.textContent = "Card number must be 16 digits.";
+        isValid = false;
+    }
+
+    // Validate name
+    if (!namePattern.test(name)) {
+        nameError.textContent = "Name must contain only alphabets and spaces.";
+        isValid = false;
+    }
+
+    // Validate expiry date
+    if (!expDatePattern.test(expDate)) {
+        expDateError.textContent = "Expiry date must be in YYYY-MM-DD format.";
+        isValid = false;
+    }
+
+    // Validate CVV
+    if (!cvvPattern.test(cvv)) {
+        cvvError.textContent = "CVV must be 3 digits.";
+        isValid = false;
+    }
+
+    // Validate balance
+    if (!balancePattern.test(balance)) {
+        balanceError.textContent = "Balance must be a number with up to 2 decimal places.";
+        isValid = false;
+    }
+
+    return isValid; // Return false to prevent form submission if invalid
+}
+
+function validateGoalForm() {
+        const goalName = document.querySelector("input[name='goal_name']").value.trim();
+        const goalTarget = document.querySelector("input[name='goal_target']").value.trim();
+        const goalTargetError = document.getElementById("goalTargetError");
+        const goalnameerror=document.getElementById("goalnameerror")
+        let isValid = true;
+
+        // Reset error message
+        goalTargetError.textContent = "";
+        goalnameerror.textContent="";
+
+        // Regex patterns
+    const amountPattern = /^[0-9]+(\.[0-9]{1,2})?$/; // Numeric with up to 2 decimal places
+
+
+        // Validate Goal Name
+        if (goalName === "") {
+            goalnameerror.textContent="Please Enter Goal Name";
+            isValid = false;
+        }
+
+        // Validate Goal Target (must be a number greater than 1)
+        // Validate Amount (greater than 1)
+        if (!amountPattern.test(goalTarget) || parseFloat(goalTarget) <= 1) {
+        goalTargetError.textContent = "Amount must be a valid number greater than 1.";
+        isValid = false;
+        }
+        return isValid;  // Prevent form submission if invalid
+    }
+
+function clearErrors() {
+    // Clear all error messages
+    const errorElements = document.querySelectorAll('.error-popup');
+    errorElements.forEach(element => {
+        element.innerText = '';
+        element.style.display = 'none'; // Hide error messages
+    });
+
+    // Remove error-border from fields
+    const inputFields = document.querySelectorAll('input, select');
+    inputFields.forEach(field => {
+        field.classList.remove('error-border');
+    });
+}
+
+function showErrorPopup(fieldId) {
+    const field = document.getElementById(fieldId);
+    const errorPopup = document.getElementById(fieldId + 'Error');
+    errorPopup.style.display = 'block';  // Show the error popup
+    field.classList.add('error-border'); // Optional: Add a red border to the input field for visibility
+}
+
+       
+        
+ // Function to show/hide sections based on user click
+function showSection(section) {
+    // Remove active-section class from all sections
+    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active-section'));
+    
+    // Add active-section class to the clicked section
+    const sectionElement = document.getElementById(section);
+    sectionElement.classList.add('active-section');
+}
+
+
+        // Modal functions for adding transactions
+        function showAddTransactionModal() {
+            document.getElementById('addTransactionModal').style.display = 'block';
+        }
+        function showaddBillModal(){
+            document.getElementById('addBillModal').style.display='block';
+        }
+        function closeAddTransactionModal() {
+            document.getElementById('addTransactionModal').style.display = 'none';
+            
+        }
+        function closeAddbillModal(){
+            document.getElementById('addBillModal').style.display = 'none';
+        }
+
+        function showAddAccountModal(){
+            document.getElementById('addAccountModal').style.display='block';
+        }
+        function closeAddAccountModal(){
+            document.getElementById('addAccountModal').style.display='none';
+        }
+
+        function showNotification(message) {
+            const notificationArea = document.getElementById('notification-area');
+            notificationArea.innerHTML = `<div class="notification">${message}</div>`;
+        }
+//..//
+
+   
+    document.addEventListener("DOMContentLoaded", function () {
+    // Fetch all goals and populate the table
+    fetch("/get_all_goals")
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById("goals-table").querySelector("tbody");
+            data.forEach(goal => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${goal.goal_name}</td>
+                    <td>${goal.goal_target.toFixed(2)}</td>
+                    <td>${goal.account_name}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        });
+
+   
+    // Handle the add goal form submission
+    const form = document.getElementById("goal-form");
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const goal_name = document.getElementById("goal_name").value;
+        const goal_target = document.getElementById("goal_target").value;
+        const account_id = document.getElementById("account_id").value;
+
+        fetch('/add_goal', {
+        method: 'POST',
+        body: JSON.stringify({ goal_name: goalName, goal_target: goalTarget, account_id: accountId }),
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the table or do something after successful goal addition
+            alert('Goal added successfully');
+        } else {
+            alert('Error adding goal');
+        }
+    });
+    });
+
+    // Fetch all account names to populate the goal form
+    fetch("/get_all_accounts")
+        .then(response => response.json())
+        .then(accounts => {
+            const accountSelect = document.getElementById("account_id");
+            accounts.forEach(account => {
+                const option = document.createElement("option");
+                option.value = account.id;
+                option.textContent = account.name;
+                accountSelect.appendChild(option);
+            });
+        });
+});
+
+function toggleStatus(element) {
+    let currentStatus = element.getAttribute('data-status');
+    let newStatus = currentStatus === 'Paid' ? 'Pending' : 'Paid';
+    let newColor = newStatus === 'Paid' ? 'green' : 'red';
+
+    element.setAttribute('data-status', newStatus);
+    element.style.backgroundColor = newColor;
+    element.textContent = newStatus;
+    // Send the updated status to the backend
+    fetch('/update_bill_status', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ bill_id: billId, status: newStatus })
+    }).then(response => {
+        if (!response.ok) {
+            alert("Failed to update the status. Please try again.");
+            // Revert the changes in case of error
+            element.setAttribute('data-status', currentStatus);
+            element.style.backgroundColor = currentStatus === 'Paid' ? 'green' : 'red';
+            element.textContent = currentStatus;
+        }
+    });
+}
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const bellIcon = document.getElementById('notificationBell');
+        const dropdown = document.getElementById('notificationDropdown');
+
+        // Toggle dropdown visibility on bell click
+        bellIcon.addEventListener('click', function () {
+            if (dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+            } else {
+                dropdown.style.display = 'block';
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function (event) {
+            if (!bellIcon.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+    });
+
+
+    // dynamic trans table
+
+    const transactionRows = document.querySelectorAll(".transaction-row");
+    const maxVisibleRows = 7;
+    const toggleButton = document.getElementById("toggle-older");
+
+    // Initially hide rows beyond the 7th
+    for (let i =  0; i < transactionRows.length-maxVisibleRows; i++) {
+        transactionRows[i].style.display = "none";
+    }
+
+    // Toggle the visibility of older transactions
+    function toggleOlderRows() {
+        const hiddenRows = Array.from(transactionRows).slice(0,transactionRows.length-maxVisibleRows);
+        const isCurrentlyHidden = hiddenRows[0].style.display === "none";
+        
+        // Show or hide the older rows
+        hiddenRows.forEach(row => {
+            row.style.display = isCurrentlyHidden ? "table-row" : "none";
+        });
+        
+        // Change the button text based on the current state
+        toggleButton.textContent = isCurrentlyHidden ? "Show Fewer Transactions" : "Show Older Transactions";
+    }
+
+    //goal alerting 
+
+    {% if goal_achieved %}
+            window.onload = function() {
+                alert("Congrats! Goal '{{ goal_name }}' has been reached!");
+            }
+    {% endif %}
+
+//goal table dynamic
+function goallike() {
+        // Get all hidden rows
+        const rows = document.querySelectorAll('.goalrow.hidden');
+        const button = document.getElementById('toggleButton');
+        
+        // Check if rows are currently visible
+        let areHiddenRowsVisible = false;
+        rows.forEach(row => {
+            if (row.style.display === 'table-row') {
+                areHiddenRowsVisible = true;
+            }
+        });
+
+        if (areHiddenRowsVisible) {
+            // Hide rows
+            rows.forEach(row => {
+                row.style.display = 'none';
+            });
+            button.textContent = 'Show Older Goals'; // Update button label
+        } else {
+            // Show rows
+            rows.forEach(row => {
+                row.style.display = 'table-row';
+            });
+            button.textContent = 'Hide Older Goals'; // Update button label
+        }
+    }
+
+    // On page load, ensure rows are hidden initially
+    document.addEventListener('DOMContentLoaded', () => {
+        const rows = document.querySelectorAll('.goalrow.hidden');
+        rows.forEach(row => {
+            row.style.display = 'none';
+        });
+    });
+
+</script>
+
+</body>
+</html>
